@@ -67,6 +67,14 @@ public class ArgParser {
         configOptions = new Options();
         configFileOptions = new Options();
 
+        // Help option
+        configOptions.addOption(Option.builder("h")
+                .longOpt("help")
+                .hasArg(false)
+                .desc("Print these options")
+                .required(false)
+                .build());
+
         // Mode option
         configOptions.addOption(Option.builder("m")
                 .longOpt("mode")
@@ -146,11 +154,6 @@ public class ArgParser {
             logger.debug("Command line argments weren't valid for specifying a config file.");
         }
         if (config == null) {
-            // check for presence of the help flag
-            if (helpFlagged(args)) {
-                printHelpWithoutHeaderMessage();
-            }
-
             try {
                 c = parseConfigArgs(args);
                 config = this.parseConfigurationArgs(c);
@@ -166,20 +169,6 @@ public class ArgParser {
 
 
         return config;
-    }
-
-    /**
-     * @param args
-     * @return
-     */
-    private boolean helpFlagged(final String[] args) {
-        for (String arg : args) {
-            if (arg.equals("-h")) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private CommandLine parseConfigFileCommandLineArgs(final String[] args) throws ParseException {
@@ -243,6 +232,11 @@ public class ArgParser {
      */
     private Config parseConfigurationArgs(final CommandLine cmd) {
         final Config config = new Config();
+
+        // check for presence of the help flag
+        if (cmd.hasOption("h")) {
+            printHelpWithoutHeaderMessage();
+        }
 
         // Inspect Mode option
         final String mode = cmd.getOptionValue('m');
